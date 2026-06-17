@@ -1,6 +1,6 @@
-name = "eco-game"
+name = "cloudpress"
 pages_build_output_dir = "./dist"
-compatibility_date = "2026-06-17"
+compatibility_date = "2026-06-16"
 
 [[d1_databases]]
 binding = "DB"
@@ -11,6 +11,4 @@ database_id = "f70551f2-c157-4e18-87b4-f2b41d67393d"
 binding = "SESSION_KV"
 id = "df28f4248d584c94a92a9d70bc16b4e6"
 
-# DO 관련 설정 삭제됨
-[triggers]
-crons = ["0 * * * *"]
+# [[durable_objects.bindings]] 및 [[migrations]] 섹션 삭제
