@@ -1,0 +1,20 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getDb } from '../../db/client';
+import { guides } from '../../db/schema';
+import { desc } from 'drizzle-orm';
+
+const db = getDb(Astro.locals.runtime.env);
+const allGuides = await db.select().from(guides).orderBy(desc(guides.views));
+---
+<Layout title="분리수거 가이드" description="모든 품목에 대한 올바른 분리수거 방법을 찾아보세요.">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {allGuides.map(guide => (
+      <a href={`/guide/${guide.slug}`} class="group bg-white p-6 rounded-2xl border border-slate-100 hover:shadow-lg transition">
+        <span class="text-xs font-bold text-blue-600 uppercase tracking-widest">{guide.category}</span>
+        <h2 class="text-xl font-bold mt-2 group-hover:text-blue-600">{guide.title} 버리는 법</h2>
+        <p class="text-slate-500 mt-2 text-sm line-clamp-2">{guide.content.replace(/<[^>]*>/g, '')}</p>
+      </a>
+    ))}
+  </div>
+</Layout>
