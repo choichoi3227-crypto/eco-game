@@ -1,0 +1,16 @@
+"dependencies": {
+  "astro": "^4.0.0",
+  "@astrojs/cloudflare": "^9.0.0",
+  "@astrojs/react": "^3.0.0", // 추가
+  "react": "^18.2.0",
+  "react-dom": "^18.2.0",
+  "chart.js": "^4.4.0", // 추가
+  "drizzle-orm": "^0.30.0",
+  "jose": "^5.2.0",
+  "satori": "^0.10.0",
+  "@resvg/resvg-js": "^2.6.0"
+},
+"devDependencies": {
+  "drizzle-kit": "^0.20.0",
+  "wrangler": "^3.0.0"
+}
