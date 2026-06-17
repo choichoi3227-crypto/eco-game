@@ -43,3 +43,26 @@ export const githubFailureLogs = sqliteTable('github_failure_logs', {
   errorMessage: text('error_message').notNull(),
   notified: boolean('notified').default(false),
 });
+
+
+import { sqliteTable, text, integer, primaryKey } from 'drizzle-orm/sqlite-core';
+import { users } from './schema'; // 기존 유저 테이블 임포트
+
+// 뱃지 정의 테이블
+export const badges = sqliteTable('badges', {
+  id: text('id').primaryKey(), // 예: 'first_login', 'level_10'
+  name: text('name').notNull(),
+  description: text('description').notNull(),
+  icon: text('icon').notNull(), // 이모지 또는 SVG 경로
+  requirementType: text('requirement_type').notNull(), // 'level', 'correct_answers' 등
+  requirementValue: integer('requirement_value').notNull(),
+});
+
+// 유저별 획득 뱃지 (N:M 관계)
+export const userBadges = sqliteTable('user_badges', {
+  userId: text('user_id').notNull().references(() => users.id),
+  badgeId: text('badge_id').notNull().references(() => badges.id),
+  earnedAt: integer('earned_at', { mode: 'timestamp' }).default(sql`(strftime('%s', 'now'))`),
+}, (table) => ({
+  pk: primaryKey({ columns: [table.userId, table.badgeId] }),
+}));
