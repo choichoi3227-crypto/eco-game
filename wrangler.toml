@@ -1,5 +1,5 @@
-name = "cloudpress"
-pages_build_output_dir = "./dist"
+name = "eco-game"
+pages_build_output_dir = "."
 compatibility_date = "2026-06-16"
 
 [[d1_databases]]
