@@ -12,12 +12,12 @@ binding = "SESSION_KV"
 id = "df28f4248d584c94a92a9d70bc16b4e6"
 
 [[durable_objects.bindings]]
-name = "GITHUB_QUEUE_DO"
-class_name = "GitHubQueueDO"
+name = "MyDurableObject"
+class_name = "MyDurableObject"
 
 [[migrations]]
 tag = "v1"
-new_classes = ["GitHubQueueDO"]
+new_classes = ["MyDurableObject"]
 
 [triggers]
 crons = ["0 * * * *"]
