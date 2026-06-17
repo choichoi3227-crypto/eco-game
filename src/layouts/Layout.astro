@@ -1,0 +1,31 @@
+---
+interface Props { title: string; description: string; }
+const { title, description } = Astro.props;
+---
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{title} | CloudPress</title>
+    <meta name="description" content={description} />
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR-ID" crossorigin="anonymous"></script>
+  </head>
+  <body class="bg-[#F9FAFB] text-slate-900 font-sans selection:bg-blue-100">
+    <nav class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
+      <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+        <a href="/" class="text-xl font-black text-blue-600">CloudPress</a>
+        <div class="flex gap-8 text-sm font-bold text-slate-600">
+          <a href="/game" class="hover:text-blue-600">GAME</a>
+          <a href="/guide" class="hover:text-blue-600">GUIDE</a>
+          <a href="/stats" class="hover:text-blue-600">STATS</a>
+        </div>
+      </div>
+    </nav>
+    <main class="max-w-6xl mx-auto px-4 py-12 min-h-screen">
+      <slot />
+    </main>
+    <footer class="bg-white border-t border-slate-200 py-12 text-center text-slate-400 text-sm">
+      &copy; 2024 클라우드프레스. All rights reserved.
+    </footer>
+  </body>
+</html>
