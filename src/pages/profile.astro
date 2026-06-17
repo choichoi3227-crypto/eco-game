@@ -50,6 +50,44 @@ const remainingXp = nextLevelXpThreshold - currentXp;
         </div>
       </div>
 
+---
+// ... (기존 유저 정보 로딩 로직)
+const allBadges = await db.select().from(badges).all();
+const earnedBadgeRows = await db.select()
+  .from(userBadges)
+  .where(eq(userBadges.userId, user.id))
+  .all();
+
+const earnedBadgeIds = new Set(earnedBadgeRows.map(b => b.badgeId));
+---
+
+<!-- 프로필 정보 하단에 추가 -->
+<div class="mt-10 p-10 bg-white rounded-[40px] border border-slate-100 shadow-xl">
+  <h2 class="text-xl font-black text-slate-900 mb-6 flex items-center gap-2">
+    <span class="text-2xl">🏆</span> 획득한 뱃지
+  </h2>
+  
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+    {allBadges.map(badge => {
+      const isEarned = earnedBadgeIds.has(badge.id);
+      return (
+        <div class={`relative p-6 rounded-3xl border text-center transition-all ${isEarned ? 'bg-blue-50 border-blue-100' : 'bg-slate-50 border-slate-100 opacity-40 grayscale'}`}>
+          <div class="text-4xl mb-3">{badge.icon}</div>
+          <div class="text-sm font-bold text-slate-900">{badge.name}</div>
+          <div class="text-[10px] text-slate-500 mt-1 leading-tight">{badge.description}</div>
+          
+          {!isEarned && (
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span class="bg-slate-800/10 p-1 rounded-full text-slate-400">🔒</span>
+            </div>
+          )}
+        </div>
+      )
+    })}
+  </div>
+</div>
+
+
       <!-- XP 정보 섹션 -->
       <div class="p-10 space-y-8">
         <div>
@@ -84,3 +122,5 @@ const remainingXp = nextLevelXpThreshold - currentXp;
     </div>
   </div>
 </Layout>
+
+
