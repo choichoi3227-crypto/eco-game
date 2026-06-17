@@ -6,6 +6,8 @@ export const users = sqliteTable('users', {
   username: text('username').notNull().unique(),
   passwordHash: text('password_hash').notNull(),
   role: text('role').default('user'), // 'admin' | 'user'
+  experiencePoints: integer('experience_points').default(0), // 추가: 경험치
+  level: integer('level').default(1), // 추가: 레벨
   createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(strftime('%s', 'now'))`),
 });
 
