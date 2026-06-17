@@ -23,6 +23,6 @@ new_classes = ["GitHubQueueDO"]
 crons = ["0 * * * *"]
 
 [vars]
-GITHUB_REPO_OWNER = "your-username"
-GITHUB_REPO_NAME = "cloudpress-storage"
+GITHUB_REPO_OWNER = "choichoi3227-crypto"
+GITHUB_REPO_NAME = "eco-game"
 # GITHUB_TOKEN, JWT_SECRET, DISCORD_WEBHOOK_URL 등은 대시보드 Secrets에 저장하세요.
