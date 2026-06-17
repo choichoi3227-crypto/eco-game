@@ -1,13 +1,14 @@
 import { getDb } from '../db/client';
 import { githubFailureLogs } from '../db/schema';
 
-export async function uploadToGitHubDirect(env: any, params: {
+export async function uploadToGitHub(env: any, params: {
   filePath: string;
-  fileContent: string; // Base64
+  fileContent: string; // Base64 string
   commitMessage: string;
 }) {
   const { GITHUB_TOKEN, GITHUB_REPO_OWNER, GITHUB_REPO_NAME } = env;
   const apiUrl = `<https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${params.filePath}>`;
+  
   const headers = {
     'Authorization': `token ${GITHUB_TOKEN}`,
     'Accept': 'application/vnd.github.v3+json',
@@ -15,7 +16,7 @@ export async function uploadToGitHubDirect(env: any, params: {
   };
 
   try {
-    // 1. 기존 파일 SHA 확인
+    // 1. 기존 파일의 SHA 확인
     const getRes = await fetch(apiUrl, { headers });
     let sha: string | undefined;
     if (getRes.ok) {
@@ -23,7 +24,7 @@ export async function uploadToGitHubDirect(env: any, params: {
       sha = data.sha;
     }
 
-    // 2. 업로드 실행
+    // 2. GitHub API로 파일 업로드
     const putRes = await fetch(apiUrl, {
       method: 'PUT',
       headers: { ...headers, 'Content-Type': 'application/json' },
@@ -36,8 +37,7 @@ export async function uploadToGitHubDirect(env: any, params: {
     });
 
     if (!putRes.ok) {
-      const errorText = await putRes.text();
-      throw new Error(`GitHub API Error: ${putRes.status} - ${errorText}`);
+      throw new Error(`GitHub API Error: ${putRes.status}`);
     }
 
     const result: any = await putRes.json();
@@ -46,7 +46,7 @@ export async function uploadToGitHubDirect(env: any, params: {
       sha: result.content.sha
     };
   } catch (error: any) {
-    // 실패 로그 기록 (D1)
+    // 실패 시 D1에 로그 기록
     const db = getDb(env);
     await db.insert(githubFailureLogs).values({
       filePath: params.filePath,
