@@ -1,0 +1,34 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="로그인" description="클라우드프레스 계정에 접속하세요.">
+  <div class="max-w-md mx-auto bg-white p-10 rounded-3xl shadow-xl border border-slate-100">
+    <h1 class="text-3xl font-black mb-6 text-center text-slate-900">Welcome Back</h1>
+    <form id="loginForm" class="space-y-4">
+      <div>
+        <label class="block text-sm font-bold text-slate-700 mb-1">아이디</label>
+        <input type="text" name="username" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none" required />
+      </div>
+      <div>
+        <label class="block text-sm font-bold text-slate-700 mb-1">비밀번호</label>
+        <input type="password" name="password" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none" required />
+      </div>
+      <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200">로그인</button>
+    </form>
+    <p class="mt-6 text-center text-sm text-slate-500">계정이 없으신가요? <a href="/register" class="text-blue-600 font-bold">회원가입</a></p>
+  </div>
+
+  <script>
+    document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target as HTMLFormElement);
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(Object.fromEntries(formData)),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (res.ok) window.location.href = '/';
+      else alert('로그인 실패');
+    });
+  </script>
+</Layout>
