@@ -1,0 +1,28 @@
+name = "cloudpress"
+compatibility_date = "2026-06-16"
+pages_build_output_dir = "./dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "cloudpress-db"
+database_id = "your-d1-id"
+
+[[kv_namespaces]]
+binding = "SESSION_KV"
+id = "your-kv-id"
+
+[[durable_objects.bindings]]
+name = "GITHUB_QUEUE_DO"
+class_name = "GitHubQueueDO"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["GitHubQueueDO"]
+
+[triggers]
+crons = ["0 * * * *"]
+
+[vars]
+GITHUB_REPO_OWNER = "your-username"
+GITHUB_REPO_NAME = "cloudpress-storage"
+# GITHUB_TOKEN, JWT_SECRET, DISCORD_WEBHOOK_URL 등은 대시보드 Secrets에 저장하세요.
