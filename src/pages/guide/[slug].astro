@@ -1,0 +1,40 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getDb } from '../../db/client';
+import { guides } from '../../db/schema';
+import { eq } from 'drizzle-orm';
+
+const { slug } = Astro.params;
+const db = getDb(Astro.locals.runtime.env);
+const guide = await db.query.guides.findFirst({ where: eq(guides.slug, slug!) });
+
+if (!guide) return Astro.redirect('/404');
+
+// 조회수 증가 (백그라운드)
+Astro.locals.runtime.ctx.waitUntil(
+  db.update(guides).set({ views: (guide.views || 0) + 1 }).where(eq(guides.id, guide.id)).run()
+);
+---
+
+<Layout title={guide.title} description={`${guide.title}의 올바른 분리수거 방법을 클라우드프레스에서 확인하세요.`}>
+  <nav class="mb-8 text-sm text-slate-400">
+    <a href="/" class="hover:text-blue-600">홈</a> / <a href="/guide" class="hover:text-blue-600">가이드</a> / {guide.category}
+  </nav>
+
+  <article class="prose prose-slate max-w-none">
+    <h1 class="text-4xl font-black text-slate-900 mb-4">{guide.title}</h1>
+    <div class="flex items-center gap-4 text-sm text-slate-500 mb-10">
+      <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full font-bold">{guide.category}</span>
+      <span>조회수 {guide.views?.toLocaleString()}회</span>
+    </div>
+    
+    <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm mb-10">
+      <div set:html={guide.content} />
+    </div>
+  </article>
+
+  <!-- 광고 영역 -->
+  <div class="my-12 p-4 bg-slate-100 rounded-xl text-center text-slate-400 text-xs tracking-widest">
+    ADVERTISEMENT
+  </div>
+</Layout>
