@@ -1,0 +1,42 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getDb } from '../../db/client';
+import { users, githubFailureLogs } from '../../db/schema';
+
+const db = getDb(Astro.locals.runtime.env);
+const totalUsers = await db.select().from(users);
+const recentFailures = await db.select().from(githubFailureLogs).limit(5);
+---
+<Layout title="Admin Dashboard" description="클라우드프레스 관리자 전용 페이지">
+  <div class="space-y-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+        <h3 class="text-slate-400 text-sm font-bold uppercase">Total Users</h3>
+        <p class="text-4xl font-black text-slate-900">{totalUsers.length}</p>
+      </div>
+      <!-- 기타 통계 카드 -->
+    </div>
+
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+      <div class="p-6 border-b border-slate-50 font-bold">최근 GitHub API 실패 로그</div>
+      <table class="w-full text-left">
+        <thead class="bg-slate-50 text-xs font-bold text-slate-400">
+          <tr>
+            <th class="p-4">Timestamp</th>
+            <th class="p-4">File Path</th>
+            <th class="p-4">Error</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm">
+          {recentFailures.map(log => (
+            <tr class="border-t border-slate-50">
+              <td class="p-4">{new Date(log.timestamp! * 1000).toLocaleString()}</td>
+              <td class="p-4 font-mono">{log.filePath}</td>
+              <td class="p-4 text-red-500">{log.errorMessage}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</Layout>
