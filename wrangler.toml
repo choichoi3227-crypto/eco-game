@@ -4,7 +4,7 @@ pages_build_output_dir = "./dist"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "cloudpress-db"
+database_name = "ecogame-db"
 database_id = "your-d1-id"
 
 [[kv_namespaces]]
