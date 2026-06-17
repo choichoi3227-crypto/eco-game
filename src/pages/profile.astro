@@ -1,0 +1,86 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getDb } from '../db/client';
+import { users } from '../db/schema';
+import { eq } from 'drizzle-orm';
+import { jwtVerify } from 'jose';
+
+const token = Astro.cookies.get('auth_token')?.value;
+if (!token) return Astro.redirect('/login');
+
+const env = Astro.locals.runtime.env;
+const { payload } = await jwtVerify(token, new TextEncoder().encode(env.JWT_SECRET));
+const db = getDb(env);
+
+const user = await db.query.users.findFirst({
+  where: eq(users.id, payload.id as string)
+});
+
+if (!user) return Astro.redirect('/login');
+
+// 레벨 시스템 로직 (이전 API와 동일한 로직 적용)
+const currentLevel = user.level || 1;
+const currentXp = user.experiencePoints || 0;
+const xpToLevelUpBase = 100;
+const getXpForNextLevel = (level: number) => xpToLevelUpBase * Math.pow(2, level - 1);
+const getXpForCurrentLevelLimit = (level: number) => level === 1 ? 0 : getXpForNextLevel(level - 1);
+
+const nextLevelXpThreshold = getXpForNextLevel(currentLevel);
+const prevLevelXpThreshold = currentLevel === 1 ? 0 : getXpForNextLevel(currentLevel - 1);
+
+const xpInCurrentLevel = currentXp - prevLevelXpThreshold;
+const xpRequiredForNext = nextLevelXpThreshold - prevLevelXpThreshold;
+const progressPercent = Math.min(Math.round((xpInCurrentLevel / xpRequiredForNext) * 100), 100);
+const remainingXp = nextLevelXpThreshold - currentXp;
+---
+
+<Layout title="내 프로필" description="나의 분리수거 레벨과 경험치를 확인하세요.">
+  <div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-[40px] border border-slate-100 shadow-xl overflow-hidden">
+      <!-- 헤더 섹션 -->
+      <div class="bg-blue-600 p-10 text-white">
+        <div class="flex items-center gap-6">
+          <div class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center text-4xl font-black border-4 border-white/30">
+            {currentLevel}
+          </div>
+          <div>
+            <h1 class="text-3xl font-black">{user.username}님</h1>
+            <p class="opacity-80 font-medium">환경을 지키는 레벨 {currentLevel} 가디언</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- XP 정보 섹션 -->
+      <div class="p-10 space-y-8">
+        <div>
+          <div class="flex justify-between items-end mb-4">
+            <span class="text-sm font-bold text-slate-400 uppercase tracking-widest">Level Progress</span>
+            <span class="text-2xl font-black text-blue-600">{progressPercent}%</span>
+          </div>
+          <div class="w-full h-4 bg-slate-100 rounded-full overflow-hidden">
+            <div class="h-full bg-blue-600 transition-all duration-1000" style={`width: ${progressPercent}%`}></div>
+          </div>
+          <div class="flex justify-between mt-3 text-xs font-bold text-slate-400">
+            <span>현재 {currentXp} XP</span>
+            <span>다음 레벨까지 {remainingXp} XP 남음</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
+            <div class="text-xs font-bold text-slate-400 mb-1">총 획득 경험치</div>
+            <div class="text-2xl font-black text-slate-900">{currentXp.toLocaleString()}</div>
+          </div>
+          <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
+            <div class="text-xs font-bold text-slate-400 mb-1">랭킹 순위</div>
+            <div class="text-2xl font-black text-slate-900">상위 5%</div>
+          </div>
+        </div>
+
+        <a href="/game" class="block w-full py-5 bg-blue-600 text-white text-center rounded-2xl font-black hover:bg-blue-700 transition shadow-lg shadow-blue-200">
+          경험치 쌓으러 가기
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>
